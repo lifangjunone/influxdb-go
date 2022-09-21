@@ -1,0 +1,5 @@
+token = "KOS4mkvpgmtT9kljedm9ce4cIwqAXNbHWIn0tgXe27fv7ULKtQRtzbclG6VbiAUWO_PLBnxB6tSBfZADyF_nmw=="
+bucket = "go-learn"
+org = "influxdb-go"
+host = "localhost"
+port = "8086"
