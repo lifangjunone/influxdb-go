@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	influxdb_manage "influxdb-go/components/influxdb"
 	influxdb_conf "influxdb-go/conf/influxdb"
 	"influxdb-go/service_centers"
@@ -15,11 +16,20 @@ func main() {
 		client := influxdbSvc.Client
 		writeAPI := client.WriteAPI(influxdbSvc.Conf.Org, influxdbSvc.Conf.Bucket)
 		// write line protocol
-		writeAPI.WriteRecord(fmt.Sprintf("stat,unit=temperature avg=%f,max=%f", 23.5, 45.0))
-		writeAPI.WriteRecord(fmt.Sprintf("stat,unit=temperature avg=%f,max=%f", 22.5, 45.0))
-		writeAPI.WriteRecord(fmt.Sprintf("CPU load%f, Memory%f", 23.5, 45.0))
-		writeAPI.WriteRecord(fmt.Sprintf("CPU load%f, Memory%f", 24.6, 46.0))
-		writeAPI.WriteRecord(fmt.Sprintf("CPU load%f, Memory%f", 25.7, 46.0))
+		p := influxdb2.NewPoint("stat",
+			map[string]string{"unit": "temperature"},
+			map[string]interface{}{"avg": 24.5, "max": 45},
+			time.Now())
+		// write point asynchronously
+		writeAPI.WritePoint(p)
+		// create point using fluent style
+		p = influxdb2.NewPointWithMeasurement("stat").
+			AddTag("unit", "temperature").
+			AddField("avg", 23.2).
+			AddField("max", 45).
+			SetTime(time.Now())
+		// write point asynchronously
+		writeAPI.WritePoint(p)
 		// Flush writes
 		writeAPI.Flush()
 		time.Sleep(5 * time.Second)
